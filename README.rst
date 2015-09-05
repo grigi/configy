@@ -18,11 +18,10 @@ Specify the configuration directives as early in execution as possible:
     
     # Every option is optional, fill in as makes sense.
     configy.load_config(
-        config='the_configuration.yaml', # The default config file if not specified as an ENV var
-        env='CONFIGY_FILE',              # The ENV var to look for a config file
-        defaults='defaults.yaml',        # The defaults that is always loaded.
-        lazy=True                        # configy only resolves the configuration on first access,
-                                         # The default is True
+        conf='the_configuration.yaml',  # The default config file if not specified as an ENV var
+        env='CONFIGY_FILE',             # The ENV var to look for a config file
+        defaults='defaults.yaml',       # The defaults that is always loaded.
+        data={'manual': 'defaults'}     # Manually provided defaults loaded
     )
 
 Given a sample YAML config file of:
@@ -84,7 +83,7 @@ One can also define configuration to be used:
 .. code-block:: python
 
     @testconfig.load_config(
-        config='test_config.yaml'
+        conf='test_config.yaml'
     )
     def test_load_config():
         assert config.testvalue == 'test result'

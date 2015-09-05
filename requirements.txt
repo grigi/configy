@@ -1,6 +1,7 @@
 # configy
 PyYAML==3.11
 
+# What follows here is just for testing or code grading:
 # tox
 tox=2.1.1
 virtualenv==13.1.2
