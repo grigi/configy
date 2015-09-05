@@ -1,6 +1,7 @@
 '''
 Configy confguration container
 '''
+# pylint: disable=W0212,R0903
 
 class xdict(dict):
 
@@ -20,7 +21,9 @@ class xdict(dict):
 
 
 class ConfigContainer(object):
-    """Singleton containing configuration"""
+    '''
+    Singleton containing configuration
+    '''
 
     def __init__(self):
         self._config = xdict()
@@ -32,23 +35,28 @@ class ConfigContainer(object):
         return self._config
 
     def __getitem__(self, item):
+        '''
+        Override .get() to use config reference correctly
+        '''
         return self._config[item]
 
     def __getattr__(self, attr):
-        """Override getattr() so config.SOME_VALUE works transparently"""
+        '''
+        Override getattr() so config.SOME_VALUE works transparently
+        '''
         return self._config[attr]
 
 config = ConfigContainer()
 
 def extend_config(conf, data):
     def recursive_update(_conf, _data):
-        for k,v in _data.items():
+        for k, v in _data.items():
             if isinstance(v, dict) and isinstance(_conf[k], dict):
                 _conf[k] = recursive_update(_conf[k], v)
             else:
                 _conf[k] = v
         return _conf
-    
+
     return recursive_update(conf, data)
 
 def build_config(conf=None, env=None, defaults=None, data=None):

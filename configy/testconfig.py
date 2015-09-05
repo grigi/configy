@@ -1,8 +1,9 @@
+# pylint: disable=W0212,W0142
 from functools import wraps
-from copy import deepcopy
-from .config_container import *
+from .config_container import config, build_config, extend_config
 
 import json
+
 
 def override_config(data):
     def wrap(callback):
@@ -32,7 +33,7 @@ def load_config(**kwconf):
                 ret = callback(*args, **kwargs)
             except:
                 config._set_config(old_config)
-                raise 
+                raise
             config._set_config(old_config)
             return ret
         return wrapper

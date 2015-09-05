@@ -36,7 +36,7 @@ class ConfigyTest(unittest.TestCase):
     @unittest.skip('not implemented')
     def test_config_casting_bool(self):
         val = config.Something.one.as_bool()
-        self.assertIsTrue(val)
+        self.assertTrue(val)
 
     @testconfig.override_config({
         'Something': {

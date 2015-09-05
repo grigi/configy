@@ -46,7 +46,7 @@ If you try to access any configuration value that isn't defined you will get an 
     >>> config.Something.other
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
-    KeyError: 'Something' has no item 'other'
+    KeyError: 'other'
 
 The config object is just a dictionary, so you can use it as a regular dictionary as well:
 
