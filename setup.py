@@ -10,10 +10,8 @@ def get_version(fname):
     else:
         raise RuntimeError("Unable to find version string in %s." % (fname,))
 
-def get_requirements():
-    requirements = [
-        'PyYAML',
-    ]
+def get_test_requirements():
+    requirements = []
     if sys.version_info[0:2] == (2, 6):
         requirements.append('unittest2')
     return requirements
@@ -29,7 +27,10 @@ setup(
     test_suite='configy.test_suite',
 
     # Dependencies
-    install_requires=get_requirements(),
+    install_requires=[
+        'PyYAML',
+    ],
+    tests_require=get_test_requirements(),
 
     # Packages
     packages=find_packages(),

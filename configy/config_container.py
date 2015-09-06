@@ -2,10 +2,9 @@
 Configy confguration container
 '''
 # pylint: disable=W0212,R0903
+from copy import deepcopy
 
 class xdict(dict):
-
-    __deepcopy__ = None
 
     def __init__(self, *a, **kw):
         super(xdict, self).__init__(*a, **kw)
@@ -49,18 +48,29 @@ class ConfigContainer(object):
 config = ConfigContainer()
 
 def extend_config(conf, data):
-    def recursive_update(_conf, _data):
-        for k, v in _data.items():
-            if isinstance(v, dict) and isinstance(_conf[k], dict):
-                _conf[k] = recursive_update(_conf[k], v)
-            else:
-                _conf[k] = v
-        return _conf
+    for k, v in data.items():
+        if isinstance(v, dict) and isinstance(conf[k], dict):
+            conf[k] = extend_config(conf[k], v)
+        else:
+            conf[k] = v
+    return conf
 
-    return recursive_update(conf, data)
 
 def build_config(conf=None, env=None, defaults=None, data=None):
-    return data
+
+    # 1) data
+    if isinstance(data, dict):
+        val = deepcopy(data)
+    else:
+        val = {}
+
+    # 2) defaults
+    #val = extend_config(defaults)
+
+    # 3) conf/env
+    #val = extend_config(conf)
+
+    return val
 
 def load_config(conf=None, env=None, defaults=None, data=None):
     config._set_config(build_config(conf, env, defaults, data))
