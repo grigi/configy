@@ -69,7 +69,7 @@ def load_file(name):
                 val = yaml.load(fil)
             if isinstance(val, dict):
                 return val
-        except IOError:
+        except (IOError, yaml.error.YAMLError):
             pass
     return None
 

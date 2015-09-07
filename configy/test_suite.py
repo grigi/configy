@@ -3,6 +3,7 @@ configy test suite
 '''
 import os
 from configy import config, testconfig, load_config
+from configy.config_container import build_config
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -27,14 +28,21 @@ class ConfigyTest(unittest.TestCase):
     Tests configy regular behaviour
     '''
 
-    def test_config_not_exist(self):
+    def test_config_attribute_not_exist(self):
         with self.assertRaises(KeyError):
             config.moo
 
-    def test_config_string(self):
+    def test_config_item_not_exist(self):
+        with self.assertRaises(KeyError):
+            config['moo']
+
+    def test_config_attribute(self):
         self.assertEqual(config.Something.one, '1')
 
-    @unittest.skip('not implemented')
+    def test_config_item(self):
+        self.assertEqual(config['Something']['one'], '1')
+
+    '''@unittest.skip('not implemented')
     def test_config_casting_int(self):
         val = config.Something.one.as_int()
         self.assertNotEqual(val, '1')
@@ -43,7 +51,7 @@ class ConfigyTest(unittest.TestCase):
     @unittest.skip('not implemented')
     def test_config_casting_bool(self):
         val = config.Something.one.as_bool()
-        self.assertTrue(val)
+        self.assertTrue(val)'''
 
     @testconfig.override_config({
         'Something': {
@@ -132,4 +140,45 @@ class ConfigyTest(unittest.TestCase):
         self.assertEqual(config.baseconf.one, 'value2')
         self.assertEqual(config.baseconf.two, 'value2')
 
+    def test_config_conf_not_parseable(self):
+        val = build_config(
+            conf=os.path.join(BASE_DIR, 'testdata/notparseable'),
+            defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+        )
+        self.assertEqual(val, {'conf1': 'value', 'baseconf':{'one': 'value'}})
 
+    def test_config_conf_empty(self):
+        val = build_config(
+            conf=os.path.join(BASE_DIR, 'testdata/empty'),
+            defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+        )
+        self.assertEqual(val, {'conf1': 'value', 'baseconf':{'one': 'value'}})
+
+    def test_config_conf_not_dict(self):
+        val = build_config(
+            conf=os.path.join(BASE_DIR, 'testdata/list.yaml'),
+            defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+        )
+        self.assertEqual(val, {'conf1': 'value', 'baseconf':{'one': 'value'}})
+
+    def test_override_config_fail(self):
+        @testconfig.override_config(data={'Something':{'one': '2'}})
+        def override_fail():
+            raise Exception('Failing on purpose')
+
+        self.assertEqual(config.Something.one, '1')
+        with self.assertRaises(Exception):
+            override_fail()
+        self.assertEqual(config.Something.one, '1')
+
+    def test_load_config_fail(self):
+        @testconfig.load_config(data={})
+        def load_fail():
+            raise Exception('Failing on purpose')
+
+        self.assertEqual(config.Something.one, '1')
+        with self.assertRaises(Exception):
+            load_fail()
+        self.assertEqual(config.Something.one, '1')
+   
+   
