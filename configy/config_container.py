@@ -7,6 +7,13 @@ from copy import deepcopy
 import yaml
 
 
+class ConfigyError(Exception):
+    '''
+    Configy exception handler
+    '''
+    pass
+
+
 class CDict(dict):
     '''
     Dict-type that allows accessing by attribute
@@ -83,8 +90,15 @@ def load_file(name):
                 val = yaml.load(fil)
             if isinstance(val, dict):
                 return val
-        except (IOError, yaml.error.YAMLError):
-            pass
+            elif val is None:
+                pass
+            else:
+                raise ConfigyError(
+                    "File '%s' does not contain key-value pairs" % name)
+        except IOError:
+            raise ConfigyError("File '%s' does not exist" % name)
+        except yaml.error.YAMLError:
+            raise ConfigyError("File '%s' is not a valid YAML document" % name)
     return None
 
 
@@ -106,12 +120,8 @@ def build_config(conf=None, env=None, defaults=None, data=None):
 
     # 3) conf/env
     if env:
-        _conf = os.environ.get(env, conf)
-        _val = load_file(_conf)
-        if not _val:
-            env = None
-    if not env:
-        _val = load_file(conf)
+        conf = os.environ.get(env, conf)
+    _val = load_file(conf)
     if _val:
         val = extend_config(val, _val)
 

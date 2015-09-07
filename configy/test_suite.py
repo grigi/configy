@@ -4,7 +4,7 @@ configy test suite
 # pylint: disable=W0104
 import os
 from configy import config, testconfig, load_config
-from configy.config_container import build_config
+from configy.config_container import build_config, ConfigyError
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -118,7 +118,7 @@ class ConfigyTest(unittest.TestCase):
         defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
     )
     def test_load_config_conf_undef_env(self):
-        '''load_config: env gracefully fails for non-existing env lookup'''
+        '''load_config: graecfully ignores non-set ENV val'''
         with self.assertRaises(KeyError):
             config.Something.one
 
@@ -127,28 +127,22 @@ class ConfigyTest(unittest.TestCase):
         self.assertEqual(config.baseconf.one, 'value2')
         self.assertEqual(config.baseconf.two, 'value2')
 
-    @testconfig.load_config(
-        conf=os.path.join(BASE_DIR, 'testdata/conf2.yaml'),
-        env='CONFIGY_NOTFILE',
-        defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
-    )
     def test_load_config_conf_bad_env(self):
-        '''load_config: env gracefully fails for non-existing file'''
-        with self.assertRaises(KeyError):
-            config.Something.one
-
-        self.assertEqual(config.conf1, 'value')
-        self.assertEqual(config.conf2, 'value2')
-        self.assertEqual(config.baseconf.one, 'value2')
-        self.assertEqual(config.baseconf.two, 'value2')
+        '''load_config: raises ConfigyError for non-existing file'''
+        with self.assertRaises(ConfigyError):
+            build_config(
+                conf=os.path.join(BASE_DIR, 'testdata/conf2.yaml'),
+                env='CONFIGY_NOTFILE',
+                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+            )
 
     def test_build_config_not_parseable(self):
-        '''build_config: gracefully handles non-parseable file'''
-        val = build_config(
-            conf=os.path.join(BASE_DIR, 'testdata/notparseable'),
-            defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
-        )
-        self.assertEqual(val, {'conf1': 'value', 'baseconf': {'one': 'value'}})
+        '''build_config: raises ConfigyError for non-parseable file'''
+        with self.assertRaises(ConfigyError):
+            build_config(
+                conf=os.path.join(BASE_DIR, 'testdata/notparseable'),
+                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+            )
 
     def test_build_config_conf_empty(self):
         '''build_config: ignores empty document'''
@@ -159,12 +153,12 @@ class ConfigyTest(unittest.TestCase):
         self.assertEqual(val, {'conf1': 'value', 'baseconf': {'one': 'value'}})
 
     def test_build_config_conf_not_dict(self):
-        '''build_config: ignores non keyed config files'''
-        val = build_config(
-            conf=os.path.join(BASE_DIR, 'testdata/list.yaml'),
-            defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
-        )
-        self.assertEqual(val, {'conf1': 'value', 'baseconf': {'one': 'value'}})
+        '''build_config: raises ConfigyError for keyed config files'''
+        with self.assertRaises(ConfigyError):
+            build_config(
+                conf=os.path.join(BASE_DIR, 'testdata/list.yaml'),
+                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+            )
 
     def test_override_config_fail(self):
         '''override_config: Restores config after function exception'''
