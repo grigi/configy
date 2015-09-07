@@ -7,15 +7,18 @@ from copy import deepcopy
 import yaml
 
 
-class xdict(dict):
+class CDict(dict):
+    '''
+    Dict-type that allows accessing by attribute
+    '''
 
     def __init__(self, *a, **kw):
-        super(xdict, self).__init__(*a, **kw)
+        super(CDict, self).__init__(*a, **kw)
 
     def __getitem__(self, item):
-        val = super(xdict, self).__getitem__(item)
+        val = super(CDict, self).__getitem__(item)
         if isinstance(val, dict):
-            return xdict(val)
+            return CDict(val)
         return val
 
     def __getattr__(self, item):
@@ -28,12 +31,18 @@ class ConfigContainer(object):
     '''
 
     def __init__(self):
-        self._config = xdict()
+        self._config = CDict()
 
     def _set_config(self, conf):
-        self._config = xdict(conf)
+        '''
+        Private helper to set the config data to new dict
+        '''
+        self._config = CDict(conf)
 
     def _get_config(self):
+        '''
+        Private helper that gets the actual config data
+        '''
         return self._config
 
     def __getitem__(self, item):
@@ -48,15 +57,20 @@ class ConfigContainer(object):
         '''
         return self._config[attr]
 
-config = ConfigContainer()
+config = ConfigContainer()  # pylint: disable=C0103
+
 
 def extend_config(conf, data):
-    for k, v in data.items():
-        if isinstance(v, dict) and isinstance(conf.get(k, None), dict):
-            conf[k] = extend_config(conf[k], v)
+    '''
+    Extends the config by replacing the overwriting the dataset granularily.
+    '''
+    for key, val in data.items():
+        if isinstance(val, dict) and isinstance(conf.get(key, None), dict):
+            conf[key] = extend_config(conf[key], val)
         else:
-            conf[k] = v
+            conf[key] = val
     return conf
+
 
 def load_file(name):
     '''
@@ -73,7 +87,11 @@ def load_file(name):
             pass
     return None
 
+
 def build_config(conf=None, env=None, defaults=None, data=None):
+    '''
+    Builds the config for load_config. See load_config for details.
+    '''
 
     # 1) data
     if isinstance(data, dict):
@@ -91,7 +109,7 @@ def build_config(conf=None, env=None, defaults=None, data=None):
         _conf = os.environ.get(env, conf)
         _val = load_file(_conf)
         if not _val:
-            env=None
+            env = None
     if not env:
         _val = load_file(conf)
     if _val:
@@ -99,6 +117,21 @@ def build_config(conf=None, env=None, defaults=None, data=None):
 
     return val
 
-def load_config(conf=None, env=None, defaults=None, data=None):
-    config._set_config(build_config(conf, env, defaults, data))
 
+def load_config(conf=None, env=None, defaults=None, data=None):
+    '''
+    Loads configuration and sets the config singleton.
+
+    In order of least precedence:
+    data
+        Manually provided defaults as dict
+    defaults
+        File-name of defaults to load
+    env
+        Overrides conf file-name based on existance of env var with this name.
+        If env-var points to non-existing or unparseable file, then conf is
+         loaded as per usual.
+    conf
+        Default configuration file if ``env`` doesn't exist.
+    '''
+    config._set_config(build_config(conf, env, defaults, data))
