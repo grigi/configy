@@ -1,0 +1,5 @@
+conf2: value2
+baseconf:
+  one: value2
+  two: value2
+

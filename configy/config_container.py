@@ -2,7 +2,10 @@
 Configy confguration container
 '''
 # pylint: disable=W0212,R0903
+import os
 from copy import deepcopy
+import yaml
+
 
 class xdict(dict):
 
@@ -49,12 +52,26 @@ config = ConfigContainer()
 
 def extend_config(conf, data):
     for k, v in data.items():
-        if isinstance(v, dict) and isinstance(conf[k], dict):
+        if isinstance(v, dict) and isinstance(conf.get(k, None), dict):
             conf[k] = extend_config(conf[k], v)
         else:
             conf[k] = v
     return conf
 
+def load_file(name):
+    '''
+    Loads the given file by name as a dict object.
+    Returns None on error.
+    '''
+    if name:
+        try:
+            with open(name) as fil:
+                val = yaml.load(fil)
+            if isinstance(val, dict):
+                return val
+        except IOError:
+            pass
+    return None
 
 def build_config(conf=None, env=None, defaults=None, data=None):
 
@@ -65,10 +82,20 @@ def build_config(conf=None, env=None, defaults=None, data=None):
         val = {}
 
     # 2) defaults
-    #val = extend_config(defaults)
+    _val = load_file(defaults)
+    if _val:
+        val = extend_config(val, _val)
 
     # 3) conf/env
-    #val = extend_config(conf)
+    if env:
+        _conf = os.environ.get(env, conf)
+        _val = load_file(_conf)
+        if not _val:
+            env=None
+    if not env:
+        _val = load_file(conf)
+    if _val:
+        val = extend_config(val, _val)
 
     return val
 

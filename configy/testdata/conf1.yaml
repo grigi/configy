@@ -1,0 +1,4 @@
+conf1: value
+baseconf:
+  one: value
+
