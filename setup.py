@@ -23,6 +23,7 @@ setup(
     long_description=open('README.rst').read(),
     author='Nickolas Grigoriadis',
     author_email='nagrigoriadis@gmail.com',
+    url='https://github.com/grigi/configy',
     zip_safe=False,
     test_suite='configy.test_suite',
 
