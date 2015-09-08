@@ -40,13 +40,15 @@ def load_config(**kwconf):
         @wraps(callback)
         def wrapper(*args, **kwargs):  # pylint: disable=C0111
             old_config = config._get_config()
-            config._set_config(build_config(**kwconf))
+            case_sensitive = kwconf.get('case_sensitive', True)
+            old_case_sensitive = config._case_sensitive
+            config._set_config(build_config(**kwconf), case_sensitive)
             try:
                 ret = callback(*args, **kwargs)
             except:
-                config._set_config(old_config)
+                config._set_config(old_config, old_case_sensitive)
                 raise
-            config._set_config(old_config)
+            config._set_config(old_config, old_case_sensitive)
             return ret
         return wrapper
     return wrap

@@ -32,6 +32,24 @@ class CDict(dict):
         return self[item]
 
 
+class ICDict(dict):
+    '''
+    Case-insensitive dict-type that allows accessing by attribute
+    '''
+
+    def __init__(self, *a, **kw):
+        super(ICDict, self).__init__(*a, **kw)
+
+    def __getitem__(self, item):
+        val = super(ICDict, self).__getitem__(item.lower())
+        if isinstance(val, dict):
+            return ICDict(val)
+        return val
+
+    def __getattr__(self, item):
+        return self[item]
+
+
 class ConfigContainer(object):
     '''
     Singleton containing configuration
@@ -39,12 +57,21 @@ class ConfigContainer(object):
 
     def __init__(self):
         self._config = CDict()
+        self._case_sensitive = True
 
-    def _set_config(self, conf):
+    def _set_config(self, conf, case_sensitive=None):
         '''
         Private helper to set the config data to new dict
         '''
-        self._config = CDict(conf)
+        if case_sensitive is None:
+            case_sensitive = self._case_sensitive
+        else:
+            self._case_sensitive = case_sensitive
+
+        if case_sensitive:
+            self._config = CDict(conf)
+        else:
+            self._config = ICDict(conf)
 
     def _get_config(self):
         '''
@@ -102,33 +129,44 @@ def load_file(name):
     return None
 
 
-def build_config(conf=None, env=None, defaults=None, data=None):
+def build_config(conf=None, env=None, defaults=None, data=None, case_sensitive=True):
     '''
     Builds the config for load_config. See load_config for details.
     '''
 
     # 1) data
     if isinstance(data, dict):
-        val = deepcopy(data)
+        res = deepcopy(data)
     else:
-        val = {}
+        res = {}
 
     # 2) defaults
-    _val = load_file(defaults)
-    if _val:
-        val = extend_config(val, _val)
+    _res = load_file(defaults)
+    if _res:
+        res = extend_config(res, _res)
 
     # 3) conf/env
     if env:
         conf = os.environ.get(env, conf)
-    _val = load_file(conf)
-    if _val:
-        val = extend_config(val, _val)
+    _res = load_file(conf)
+    if _res:
+        res = extend_config(res, _res)
 
-    return val
+    if not case_sensitive:
+        def recursive_lowkey(dic):
+            '''Recursively lowercases dict keys'''
+            _dic = {}
+            for key, val in dic.items():
+                if isinstance(val, dict):
+                    val = recursive_lowkey(val)
+                _dic[key.lower()] = val
+            return _dic
+        res = recursive_lowkey(res)
+
+    return res
 
 
-def load_config(conf=None, env=None, defaults=None, data=None):
+def load_config(conf=None, env=None, defaults=None, data=None, case_sensitive=True):
     '''
     Loads configuration and sets the config singleton.
 
@@ -143,5 +181,8 @@ def load_config(conf=None, env=None, defaults=None, data=None):
          loaded as per usual.
     conf
         Default configuration file if ``env`` doesn't exist.
+
+    case_sensitive
+        Defaults to True, set to False if you want case insensitive config
     '''
-    config._set_config(build_config(conf, env, defaults, data))
+    config._set_config(build_config(conf, env, defaults, data), case_sensitive)

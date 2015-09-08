@@ -183,3 +183,17 @@ class ConfigyTest(unittest.TestCase):
         with self.assertRaisesRegexp(Exception, 'Failing on purpose'):
             load_fail()
         self.assertEqual(config.Something.one, '1')
+
+    @testconfig.load_config(
+        data={
+            'Something': {
+                'one': '1',
+            },
+        },
+        case_sensitive=False
+    )
+    def test_case_insensitivity(self):
+        '''Case insensitive mode'''
+        self.assertEqual(config.someThinG.ONE, '1')
+        self.assertEqual(config.Something.one, '1')
+        self.assertEqual(config.sOMETHING.ONE, '1')
