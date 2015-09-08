@@ -13,14 +13,20 @@ Simple Configuration manager, plays well with testing.
 Basic Usage
 ===========
 
+Install from pypi:
+
+.. code-block:: shell
+
+    pip install configy
+
 Specify the configuration directives as early in execution as possible:
 
 .. code-block:: python
 
     import configy
     
-    # Every option is optional, fill in as makes sense.
     try:
+        # Every option is optional, fill in as makes sense.
         configy.load_config(
             conf='the_configuration.yaml',  # The default config file if not specified as an ENV var
             env='CONFIGY_FILE',             # The ENV var to look for a config file
@@ -128,6 +134,9 @@ Configy supports this use case.
         'Extra': 'defined',
     })
     def test_override():
+        # Existing values still work as per usual
+        assert config.Something.value == 'The Value'
+        # New values 
         assert config.Something.other == 'I now exist'
         assert config.Extra == 'defined'
 
