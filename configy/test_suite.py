@@ -3,8 +3,8 @@ configy test suite
 '''
 # pylint: disable=W0104
 import os
-from configy import config, testconfig, load_config
-from configy.config_container import build_config, ConfigyError
+from configy import config, testconfig, load_config, ConfigyError, to_bool
+from configy.config_container import build_config
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -197,3 +197,21 @@ class ConfigyTest(unittest.TestCase):
         self.assertEqual(config.someThinG.ONE, '1')
         self.assertEqual(config.Something.one, '1')
         self.assertEqual(config.sOMETHING.ONE, '1')
+
+    @testconfig.load_config(data={
+        'value': 'The Value',
+        'number': '42',
+        'bool1': '1',
+        'bool2': 'FALSE',
+        'bool3': 'y',
+    })
+    def test_to_bool(self):
+        '''to_bool'''
+        self.assertTrue(to_bool(config.bool1))
+        self.assertFalse(to_bool(config.bool2))
+        self.assertTrue(to_bool(config.bool3))
+        self.assertFalse(to_bool(config.number))
+        self.assertFalse(to_bool(config.value))
+        self.assertIsNone(to_bool(config.number, None))
+        self.assertTrue(to_bool(config.bool3, None))
+        
