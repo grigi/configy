@@ -91,6 +91,18 @@ class ConfigContainer(object):
         '''
         return self._config[attr]
 
+    def __iter__(self):
+        '''
+        Makes base config iterable
+        '''
+        return self._config.__iter__()
+
+    def keys(self):
+        '''
+        Makes base config mappable
+        '''
+        return self._config.keys()
+
 config = ConfigContainer()  # pylint: disable=C0103
 
 

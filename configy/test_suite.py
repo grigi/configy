@@ -214,4 +214,24 @@ class ConfigyTest(unittest.TestCase):
         self.assertFalse(to_bool(config.value))
         self.assertIsNone(to_bool(config.number, None))
         self.assertTrue(to_bool(config.bool3, None))
-        
+
+    @testconfig.load_config(data={'a': 1, 'b': 2})
+    def test_dict(self):
+        '''dict(config) should work'''
+        self.assertEqual(dict(config), {'a': 1, 'b': 2})
+
+    @testconfig.load_config(data={'a': 1, 'b': 2})
+    def test_keys(self):
+        '''config.keys() should work'''
+        self.assertEqual(sorted(list(config.keys())), ['a', 'b'])
+
+    @testconfig.load_config(data={'a': 1, 'b': 2})
+    def test_list(self):
+        '''list(config) should work'''
+        self.assertEqual(sorted(list(config)), ['a', 'b'])
+
+    @testconfig.load_config(data={'a': 1, 'b': 2})
+    def test_iter(self):
+        '''iter(config) should work'''
+        self.assertEqual(sorted(list(iter(config))), ['a', 'b'])
+
