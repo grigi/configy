@@ -3,7 +3,7 @@ Configy test helper functions
 '''
 # pylint: disable=W0212,W0142
 from functools import wraps
-from .config_container import config, build_config, extend_config
+from configy.config_container import config, build_config, extend_config
 
 import json
 

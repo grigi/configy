@@ -126,7 +126,7 @@ def load_file(name):
     if name:
         try:
             with open(name) as fil:
-                val = yaml.load(fil)
+                val = yaml.load(fil, Loader=yaml.SafeLoader)
             if isinstance(val, dict):
                 return val
             elif val is None:
