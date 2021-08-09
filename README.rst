@@ -4,8 +4,8 @@ configy
 
 Simple Configuration manager, plays well with testing.
 
-.. image:: https://travis-ci.org/grigi/configy.svg
-    :target: https://travis-ci.org/grigi/configy?branch=master
+.. image:: https://travis-ci.com/grigi/configy.svg?branch=master
+    :target: https://travis-ci.com/grigi/configy
 .. image:: https://coveralls.io/repos/grigi/configy/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/grigi/configy?branch=master
 
