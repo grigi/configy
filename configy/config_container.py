@@ -3,6 +3,7 @@ Configy confguration container
 '''
 # pylint: disable=W0212,R0903
 import os
+import re
 from copy import deepcopy
 import yaml
 
@@ -13,6 +14,18 @@ class ConfigyError(Exception):
     '''
     pass
 
+env_pattern = re.compile(r".*?\${(.*?)}.*?")
+def env_constructor(loader, node):
+    value = loader.construct_scalar(node)
+    for group in env_pattern.findall(value):
+        envvar = os.environ.get(group)
+        if not envvar:
+            raise ConfigyError("Environment variable '%s' is not defined!" % group)
+        value = value.replace("${%s}" % group, envvar)
+    return value
+
+yaml.add_implicit_resolver("!pathex", env_pattern)
+yaml.add_constructor("!pathex", env_constructor)
 
 class CDict(dict):
     '''
@@ -126,7 +139,7 @@ def load_file(name):
     if name:
         try:
             with open(name) as fil:
-                val = yaml.load(fil, Loader=yaml.SafeLoader)
+                val = yaml.load(fil, Loader=yaml.FullLoader)
             if isinstance(val, dict):
                 return val
             elif val is None:

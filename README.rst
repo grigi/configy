@@ -75,6 +75,19 @@ The config object is just a dictionary, so you can use it as a regular dictionar
     'default value'
 
 
+Environment variable substitution
+---------------------------------
+
+You can request Environment variable substitution by using ``${ENVVAR}`` in the yaml document:
+
+.. code-block:: YAML
+
+    Something:
+      full_value: ${ENV_FULL}
+      part_value: http://${ENV_PART}/something
+
+If the envvar isn't defined, it wills raise ``ConfigyError``.
+
 Helper functions
 ----------------
 

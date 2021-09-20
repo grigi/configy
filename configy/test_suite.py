@@ -235,3 +235,27 @@ class ConfigyTest(unittest.TestCase):
         '''iter(config) should work'''
         self.assertEqual(sorted(list(iter(config))), ['a', 'b'])
 
+    def test_load_config_envvar_missing(self):
+        '''load_config: Restores config after function exception'''
+        os.environ.pop('SERVICE_PASSWORD', None)
+        os.environ.pop('SERVICE_HOST', None)
+        with self.assertRaises(ConfigyError):
+            build_config(
+                conf=os.path.join(BASE_DIR, 'testdata/envvar.yaml')
+            )
+
+    def test_load_config_envvar(self):
+        '''load_config: Restores config after function exception'''
+        os.environ['SERVICE_PASSWORD'] = 'foo'
+        os.environ['SERVICE_HOST'] = 'bar'
+        conf = build_config(
+            conf=os.path.join(BASE_DIR, 'testdata/envvar.yaml')
+        )
+
+        self.assertEqual(dict(conf), {
+            'config': {
+                'password': 'foo',
+                'service': 'https://bar/service',
+                'username': 'admin'
+            }
+        })

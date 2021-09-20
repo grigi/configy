@@ -1,0 +1,4 @@
+config:
+  username: admin
+  password: ${SERVICE_PASSWORD}
+  service: https://${SERVICE_HOST}/service
