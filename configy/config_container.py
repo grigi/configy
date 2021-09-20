@@ -19,7 +19,7 @@ def env_constructor(loader, node):
     value = loader.construct_scalar(node)
     for group in env_pattern.findall(value):
         envvar = os.environ.get(group)
-        if not envvar:
+        if envvar is None:
             raise ConfigyError("Environment variable '%s' is not defined!" % group)
         value = value.replace("${%s}" % group, envvar)
     return value

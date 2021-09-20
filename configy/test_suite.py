@@ -237,6 +237,7 @@ class ConfigyTest(unittest.TestCase):
 
     def test_load_config_envvar_missing(self):
         '''load_config: Restores config after function exception'''
+        os.environ.pop('BLANKVAR', None)
         os.environ.pop('SERVICE_PASSWORD', None)
         os.environ.pop('SERVICE_HOST', None)
         with self.assertRaises(ConfigyError):
@@ -246,6 +247,7 @@ class ConfigyTest(unittest.TestCase):
 
     def test_load_config_envvar(self):
         '''load_config: Restores config after function exception'''
+        os.environ['BLANKVAR'] = ''
         os.environ['SERVICE_PASSWORD'] = 'foo'
         os.environ['SERVICE_HOST'] = 'bar'
         conf = build_config(
@@ -256,6 +258,6 @@ class ConfigyTest(unittest.TestCase):
             'config': {
                 'password': 'foo',
                 'service': 'https://bar/service',
-                'username': 'admin'
+                'username': ''
             }
         })

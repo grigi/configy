@@ -1,4 +1,4 @@
 config:
-  username: admin
+  username: ${BLANKVAR}
   password: ${SERVICE_PASSWORD}
   service: https://${SERVICE_HOST}/service
