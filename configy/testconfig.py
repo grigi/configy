@@ -1,11 +1,11 @@
 '''
 Configy test helper functions
 '''
-# pylint: disable=W0212,W0142
-from functools import wraps
-from configy.config_container import config, build_config, extend_config
-
+# pylint: disable=W0212
 import json
+from functools import wraps
+
+from configy.config_container import config, build_config, extend_config
 
 
 def override_config(data):

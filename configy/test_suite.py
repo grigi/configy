@@ -165,10 +165,10 @@ class ConfigyTest(unittest.TestCase):
         @testconfig.override_config(data={'Something': {'one': '2'}})
         def override_fail():
             '''raises Exception'''
-            raise Exception('Failing on purpose')
+            raise ValueError('Failing on purpose')
 
         self.assertEqual(config.Something.one, '1')
-        with self.assertRaisesRegexp(Exception, 'Failing on purpose'):
+        with self.assertRaisesRegex(ValueError, 'Failing on purpose'):
             override_fail()
         self.assertEqual(config.Something.one, '1')
 
@@ -177,10 +177,10 @@ class ConfigyTest(unittest.TestCase):
         @testconfig.load_config(data={})
         def load_fail():
             '''raises Exception'''
-            raise Exception('Failing on purpose')
+            raise ValueError('Failing on purpose')
 
         self.assertEqual(config.Something.one, '1')
-        with self.assertRaisesRegexp(Exception, 'Failing on purpose'):
+        with self.assertRaisesRegex(ValueError, 'Failing on purpose'):
             load_fail()
         self.assertEqual(config.Something.one, '1')
 

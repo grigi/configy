@@ -10,12 +10,6 @@ def get_version(fname):
     else:
         raise RuntimeError("Unable to find version string in %s." % (fname,))
 
-def get_test_requirements():
-    requirements = []
-    if sys.version_info[0:2] == (2, 6):
-        requirements.append('unittest2')
-    return requirements
-
 setup(
     name='configy',
     version=get_version('configy/__init__.py'),
@@ -25,13 +19,11 @@ setup(
     author_email='nagrigoriadis@gmail.com',
     url='https://github.com/grigi/configy',
     zip_safe=False,
-    test_suite='configy.test_suite',
 
     # Dependencies
     install_requires=[
         'PyYAML',
     ],
-    tests_require=get_test_requirements(),
 
     # Packages
     packages=find_packages(),
@@ -47,11 +39,15 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]
 )

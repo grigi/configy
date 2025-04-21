@@ -19,4 +19,3 @@ def to_bool(val, default=False):
     if val in ['n', 'no', '0', 'f', 'false']:
         return False
     return default
-

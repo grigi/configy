@@ -142,7 +142,7 @@ def load_file(name):
                 val = yaml.load(fil, Loader=yaml.FullLoader)
             if isinstance(val, dict):
                 return val
-            elif val is None:
+            if val is None:
                 pass
             else:
                 raise ConfigyError(
