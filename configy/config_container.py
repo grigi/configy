@@ -5,6 +5,7 @@ Configy confguration container
 import os
 import re
 from copy import deepcopy
+
 import yaml
 
 
@@ -163,10 +164,7 @@ def build_config(conf=None, env=None, defaults=None, data=None, case_sensitive=T
     '''
 
     # 1) data
-    if isinstance(data, dict):
-        res = deepcopy(data)
-    else:
-        res = {}
+    res = deepcopy(data) if isinstance(data, dict) else {}
 
     # 2) defaults
     _res = load_file(defaults)

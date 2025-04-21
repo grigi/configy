@@ -5,7 +5,7 @@ configy test suite
 import os
 import unittest
 
-from configy import config, testconfig, load_config, ConfigyError, to_bool
+from configy import ConfigyError, config, load_config, testconfig, to_bool
 from configy.config_container import build_config
 
 BASE_DIR = os.path.dirname(__file__)
@@ -68,7 +68,7 @@ class ConfigyTest(unittest.TestCase):
         self.assertEqual(config.Nothing, 'new')
 
     @testconfig.load_config(
-        conf=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+        conf=os.path.join(BASE_DIR, 'testdata/conf1.yaml'),
     )
     def test_load_config_conf(self):
         '''load_config: conf file loads'''
@@ -80,7 +80,7 @@ class ConfigyTest(unittest.TestCase):
 
     @testconfig.load_config(
         conf=os.path.join(BASE_DIR, 'testdata/conf2.yaml'),
-        defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+        defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml'),
     )
     def test_load_config_conf_defaults(self):
         '''load_config: conf extends defaults file granularily'''
@@ -95,7 +95,7 @@ class ConfigyTest(unittest.TestCase):
     @testconfig.load_config(
         conf=os.path.join(BASE_DIR, 'testdata/conf2.yaml'),
         env='CONFIGY_FILE',
-        defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+        defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml'),
     )
     def test_load_config_conf_env(self):
         '''load_config: env overrides conf'''
@@ -112,7 +112,7 @@ class ConfigyTest(unittest.TestCase):
     @testconfig.load_config(
         conf=os.path.join(BASE_DIR, 'testdata/conf2.yaml'),
         env='CONFIGY_NOTEXIST',
-        defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+        defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml'),
     )
     def test_load_config_conf_undef_env(self):
         '''load_config: graecfully ignores non-set ENV val'''
@@ -130,7 +130,7 @@ class ConfigyTest(unittest.TestCase):
             build_config(
                 conf=os.path.join(BASE_DIR, 'testdata/conf2.yaml'),
                 env='CONFIGY_NOTFILE',
-                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml'),
             )
 
     def test_build_config_not_parseable(self):
@@ -138,14 +138,14 @@ class ConfigyTest(unittest.TestCase):
         with self.assertRaises(ConfigyError):
             build_config(
                 conf=os.path.join(BASE_DIR, 'testdata/notparseable'),
-                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml'),
             )
 
     def test_build_config_conf_empty(self):
         '''build_config: ignores empty document'''
         val = build_config(
             conf=os.path.join(BASE_DIR, 'testdata/empty'),
-            defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+            defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml'),
         )
         self.assertEqual(val, {'conf1': 'value', 'baseconf': {'one': 'value'}})
 
@@ -154,7 +154,7 @@ class ConfigyTest(unittest.TestCase):
         with self.assertRaises(ConfigyError):
             build_config(
                 conf=os.path.join(BASE_DIR, 'testdata/list.yaml'),
-                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml')
+                defaults=os.path.join(BASE_DIR, 'testdata/conf1.yaml'),
             )
 
     def test_override_config_fail(self):
@@ -187,7 +187,7 @@ class ConfigyTest(unittest.TestCase):
                 'one': '1',
             },
         },
-        case_sensitive=False
+        case_sensitive=False,
     )
     def test_case_insensitivity(self):
         '''Case insensitive mode'''
@@ -220,17 +220,17 @@ class ConfigyTest(unittest.TestCase):
     @testconfig.load_config(data={'a': 1, 'b': 2})
     def test_keys(self):
         '''config.keys() should work'''
-        self.assertEqual(sorted(list(config.keys())), ['a', 'b'])
+        self.assertEqual(sorted(config.keys()), ['a', 'b'])
 
     @testconfig.load_config(data={'a': 1, 'b': 2})
     def test_list(self):
         '''list(config) should work'''
-        self.assertEqual(sorted(list(config)), ['a', 'b'])
+        self.assertEqual(sorted(config), ['a', 'b'])
 
     @testconfig.load_config(data={'a': 1, 'b': 2})
     def test_iter(self):
         '''iter(config) should work'''
-        self.assertEqual(sorted(list(iter(config))), ['a', 'b'])
+        self.assertEqual(sorted(iter(config)), ['a', 'b'])
 
     def test_load_config_envvar_missing(self):
         '''load_config: Restores config after function exception'''
@@ -239,7 +239,7 @@ class ConfigyTest(unittest.TestCase):
         os.environ.pop('SERVICE_HOST', None)
         with self.assertRaises(ConfigyError):
             build_config(
-                conf=os.path.join(BASE_DIR, 'testdata/envvar.yaml')
+                conf=os.path.join(BASE_DIR, 'testdata/envvar.yaml'),
             )
 
     def test_load_config_envvar(self):
@@ -248,13 +248,13 @@ class ConfigyTest(unittest.TestCase):
         os.environ['SERVICE_PASSWORD'] = 'foo'
         os.environ['SERVICE_HOST'] = 'bar'
         conf = build_config(
-            conf=os.path.join(BASE_DIR, 'testdata/envvar.yaml')
+            conf=os.path.join(BASE_DIR, 'testdata/envvar.yaml'),
         )
 
         self.assertEqual(dict(conf), {
             'config': {
                 'password': 'foo',
                 'service': 'https://bar/service',
-                'username': ''
-            }
+                'username': '',
+            },
         })

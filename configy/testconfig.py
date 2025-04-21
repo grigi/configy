@@ -5,7 +5,7 @@ Configy test helper functions
 import json
 from functools import wraps
 
-from configy.config_container import config, build_config, extend_config
+from configy.config_container import build_config, config, extend_config
 
 
 def override_config(data):
@@ -18,7 +18,7 @@ def override_config(data):
             old_config = config._get_config()
             new_config = extend_config(
                 json.loads(json.dumps(old_config)),
-                data
+                data,
             )
             config._set_config(new_config)
             try:
