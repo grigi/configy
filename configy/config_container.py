@@ -12,20 +12,24 @@ class ConfigyError(Exception):
     '''
     Configy exception handler
     '''
-    pass
+
 
 env_pattern = re.compile(r".*?\${(.*?)}.*?")
 def env_constructor(loader, node):
+    '''
+    Adds ENVVAR syntax support
+    '''
     value = loader.construct_scalar(node)
     for group in env_pattern.findall(value):
         envvar = os.environ.get(group)
         if envvar is None:
-            raise ConfigyError("Environment variable '%s' is not defined!" % group)
+            raise ConfigyError(f"Environment variable '{group}' is not defined!")
         value = value.replace("${%s}" % group, envvar)
     return value
 
 yaml.add_implicit_resolver("!pathex", env_pattern)
 yaml.add_constructor("!pathex", env_constructor)
+
 
 class CDict(dict):
     '''
@@ -33,10 +37,10 @@ class CDict(dict):
     '''
 
     def __init__(self, *a, **kw):
-        super(CDict, self).__init__(*a, **kw)
+        super().__init__(*a, **kw)
 
     def __getitem__(self, item):
-        val = super(CDict, self).__getitem__(item)
+        val = super().__getitem__(item)
         if isinstance(val, dict):
             return CDict(val)
         return val
@@ -51,10 +55,10 @@ class ICDict(dict):
     '''
 
     def __init__(self, *a, **kw):
-        super(ICDict, self).__init__(*a, **kw)
+        super().__init__(*a, **kw)
 
     def __getitem__(self, item):
-        val = super(ICDict, self).__getitem__(item.lower())
+        val = super().__getitem__(item.lower())
         if isinstance(val, dict):
             return ICDict(val)
         return val
@@ -63,7 +67,7 @@ class ICDict(dict):
         return self[item]
 
 
-class ConfigContainer(object):
+class ConfigContainer:
     '''
     Singleton containing configuration
     '''
@@ -138,19 +142,18 @@ def load_file(name):
     '''
     if name:
         try:
-            with open(name) as fil:
+            with open(name, encoding="utf-8") as fil:
                 val = yaml.load(fil, Loader=yaml.FullLoader)
             if isinstance(val, dict):
                 return val
             if val is None:
                 pass
             else:
-                raise ConfigyError(
-                    "File '%s' does not contain key-value pairs" % name)
-        except IOError:
-            raise ConfigyError("File '%s' does not exist" % name)
-        except yaml.error.YAMLError:
-            raise ConfigyError("File '%s' is not a valid YAML document" % name)
+                raise ConfigyError(f"File '{name}' does not contain key-value pairs")
+        except OSError as exc:
+            raise ConfigyError(f"File '{name}' does not exist") from exc
+        except yaml.error.YAMLError as exc:
+            raise ConfigyError(f"File '{name}' is not a valid YAML document") from exc
     return None
 
 

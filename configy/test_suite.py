@@ -3,15 +3,12 @@ configy test suite
 '''
 # pylint: disable=W0104
 import os
+import unittest
+
 from configy import config, testconfig, load_config, ConfigyError, to_bool
 from configy.config_container import build_config
 
 BASE_DIR = os.path.dirname(__file__)
-
-try:
-    import unittest2 as unittest  # pylint: disable=F0401
-except ImportError:
-    import unittest
 
 # Load some default config
 load_config(data={
