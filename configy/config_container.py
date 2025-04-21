@@ -5,6 +5,7 @@ Configy confguration container
 import os
 import re
 from copy import deepcopy
+from typing import Any
 
 import yaml
 
@@ -16,7 +17,7 @@ class ConfigyError(Exception):
 
 
 env_pattern = re.compile(r".*?\${(.*?)}.*?")
-def env_constructor(loader, node):
+def env_constructor(loader, node):  # type: ignore
     '''
     Adds ENVVAR syntax support
     '''
@@ -37,35 +38,29 @@ class CDict(dict):
     Dict-type that allows accessing by attribute
     '''
 
-    def __init__(self, *a, **kw):
+    def __init__(self, *a: Any, **kw: Any) -> None:
         super().__init__(*a, **kw)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> Any:
         val = super().__getitem__(item)
         if isinstance(val, dict):
             return CDict(val)
         return val
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> Any:
         return self[item]
 
 
-class ICDict(dict):
+class ICDict(CDict):
     '''
     Case-insensitive dict-type that allows accessing by attribute
     '''
 
-    def __init__(self, *a, **kw):
-        super().__init__(*a, **kw)
-
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> Any:
         val = super().__getitem__(item.lower())
         if isinstance(val, dict):
             return ICDict(val)
         return val
-
-    def __getattr__(self, item):
-        return self[item]
 
 
 class ConfigContainer:
@@ -73,11 +68,11 @@ class ConfigContainer:
     Singleton containing configuration
     '''
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._config = CDict()
         self._case_sensitive = True
 
-    def _set_config(self, conf, case_sensitive=None):
+    def _set_config(self, conf: dict, case_sensitive: bool|None=None) -> None:
         '''
         Private helper to set the config data to new dict
         '''
@@ -91,19 +86,19 @@ class ConfigContainer:
         else:
             self._config = ICDict(conf)
 
-    def _get_config(self):
+    def _get_config(self) -> CDict:
         '''
         Private helper that gets the actual config data
         '''
         return self._config
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> Any:
         '''
         Override .get() to use config reference correctly
         '''
         return self._config[item]
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> Any:
         '''
         Override getattr() so config.SOME_VALUE works transparently
         '''
@@ -124,7 +119,7 @@ class ConfigContainer:
 config = ConfigContainer()  # pylint: disable=C0103
 
 
-def extend_config(conf, data):
+def extend_config(conf: dict, data: dict) -> dict:
     '''
     Extends the config by replacing the overwriting the dataset granularily.
     '''
@@ -136,7 +131,7 @@ def extend_config(conf, data):
     return conf
 
 
-def load_file(name):
+def load_file(name: str) -> dict|None:
     '''
     Loads the given file by name as a dict object.
     Returns None on error.

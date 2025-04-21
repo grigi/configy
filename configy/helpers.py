@@ -2,7 +2,7 @@
 Contains helper tools for handling configuration
 '''
 
-def to_bool(val, default=False):
+def to_bool(val: str|None, default: bool|None=False) -> bool|None:
     '''
     Converts string to bool
 
