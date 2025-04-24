@@ -1,8 +1,10 @@
 '''
 Contains helper tools for handling configuration
 '''
+from typing import Optional
 
-def to_bool(val: str|None, default: bool|None=False) -> bool|None:
+
+def to_bool(val: Optional[str], default: Optional[bool]=None) -> Optional[bool]:
     '''
     Converts string to bool
 

@@ -5,7 +5,7 @@ Configy confguration container
 import os
 import re
 from copy import deepcopy
-from typing import Any
+from typing import Any, Optional
 
 import yaml
 
@@ -72,7 +72,7 @@ class ConfigContainer:
         self._config = CDict()
         self._case_sensitive = True
 
-    def _set_config(self, conf: dict, case_sensitive: bool|None=None) -> None:
+    def _set_config(self, conf: dict, case_sensitive: Optional[bool]=None) -> None:
         '''
         Private helper to set the config data to new dict
         '''
@@ -124,14 +124,14 @@ def extend_config(conf: dict, data: dict) -> dict:
     Extends the config by replacing the overwriting the dataset granularily.
     '''
     for key, val in data.items():
-        if isinstance(val, dict) and isinstance(conf.get(key, None), dict):
+        if isinstance(val, dict) and isinstance(conf.get(key), dict):
             conf[key] = extend_config(conf[key], val)
         else:
             conf[key] = val
     return conf
 
 
-def load_file(name: str) -> dict|None:
+def load_file(name: Optional[str]) -> Optional[dict]:
     '''
     Loads the given file by name as a dict object.
     Returns None on error.
@@ -153,7 +153,7 @@ def load_file(name: str) -> dict|None:
     return None
 
 
-def build_config(conf=None, env=None, defaults=None, data=None, case_sensitive=True):
+def build_config(conf: Optional[str]=None, env: Optional[str]=None, defaults: Optional[str]=None, data: Optional[dict]=None, case_sensitive: bool=True) -> dict:
     '''
     Builds the config for load_config. See load_config for details.
     '''
@@ -174,7 +174,7 @@ def build_config(conf=None, env=None, defaults=None, data=None, case_sensitive=T
         res = extend_config(res, _res)
 
     if not case_sensitive:
-        def recursive_lowkey(dic):
+        def recursive_lowkey(dic: dict) -> dict:
             '''Recursively lowercases dict keys'''
             _dic = {}
             for key, val in dic.items():
@@ -187,7 +187,7 @@ def build_config(conf=None, env=None, defaults=None, data=None, case_sensitive=T
     return res
 
 
-def load_config(conf=None, env=None, defaults=None, data=None, case_sensitive=True):
+def load_config(conf: Optional[str]=None, env: Optional[str]=None, defaults: Optional[str]=None, data: Optional[dict]=None, case_sensitive: bool=True) -> None:
     '''
     Loads configuration and sets the config singleton.
 
